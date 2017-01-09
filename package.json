@@ -53,5 +53,9 @@
   "babelBoilerplateOptions": {
     "entryFileName": "wayfarer.js",
     "mainVarName": "wayfarer"
+  },
+  "dependencies": {
+    "http": "0.0.0",
+    "promise": "^7.1.1"
   }
 }
