@@ -42,6 +42,7 @@
     "gulp-rename": "1.2.2",
     "gulp-sourcemaps": "1.6.0",
     "gulp-uglify": "2.0.0",
+    "http-shutdown": "^1.1.0",
     "isparta": "4.0.0",
     "json-loader": "0.5.4",
     "mocha": "3.0.2",
@@ -53,5 +54,10 @@
   "babelBoilerplateOptions": {
     "entryFileName": "wayfarer.js",
     "mainVarName": "wayfarer"
+  },
+  "dependencies": {
+    "promise": "^7.1.1",
+    "request": "^2.79.0",
+    "request-progress": "^3.0.0"
   }
 }
