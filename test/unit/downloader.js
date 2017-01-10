@@ -1,5 +1,6 @@
 var sinon = require('sinon');
-var http = require('http');
+var fs = require('fs');
+var request = require('request');
 var PassThrough = require('stream').PassThrough;
 
 import Downloader from '../../src/downloader';
@@ -14,31 +15,28 @@ describe('downloader', () => {
 
     describe('download', () => {
         beforeEach(() => {
-            sinon.stub(http, 'request');
+            sinon.stub(request, 'get');
         });
 
         afterEach(() => {
-            http.request.restore();
+            request.get.restore();
         });
 
         it('should download the specified resource to the local filesystem, by default to the folder <cwd>/public/downloads/', (done) => {
             var downloader = new Downloader('http://foo_host/some.json');
-            var expected = {some: 'json'};
-            var response = new PassThrough();
-            response.write(JSON.stringify(expected));
-            response.end();
+            var expected = JSON.stringify({some: 'json'});
 
-            var request = new PassThrough();
-            http.request.callsArgWith(1, response)
-                        .returns(request);
-
-            var result = downloader.download();
-            result.then((data) => {
-                //expect(data.local_file_path).to.equal('../../public/downloads/timestamp');
+            request.get.callsArgWith(1, null, null, expected);
+            var result = downloader.download().then((data) => {
                 expect(data.url).to.equal(downloader.url);
-                // TODO: check file
+                expect(data.local_file_path.startsWith('./public/downloads')).to.equal(true)
+                expect(fs.statSync(data.local_file_path).isFile()).to.equal(true);
+                expect(fs.readFileSync(data.local_file_path, 'utf8')).to.equal(expected);
+
+                // cleanup; remove downloaded file
+                fs.unlinkSync(data.local_file_path)
                 done();
-            });
+            }).catch(done);
         });
     });
 });

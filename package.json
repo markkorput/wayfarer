@@ -55,7 +55,8 @@
     "mainVarName": "wayfarer"
   },
   "dependencies": {
-    "http": "0.0.0",
-    "promise": "^7.1.1"
+    "mkdirp": "^0.5.1",
+    "promise": "^7.1.1",
+    "request": "^2.79.0"
   }
 }
