@@ -1,7 +1,7 @@
 const fs = require('fs')
 const Promise = require('promise')
-const mkdirp = require('mkdirp')
 const request = require('request')
+const progress = require('request-progress')
 
 class Downloader {
     constructor(url, options){
@@ -14,26 +14,21 @@ class Downloader {
     }
 
     download(){
+        var timestamp = new Date().toISOString().replace(/T/, '_').replace(/\..+/, '').replace(/:/g, '_')
+        this.local_file_path = this.folder + timestamp
+
         return new Promise((resolve, reject) => {
-            request.get(this.url, (err, response, body) => {
-                if(err){
-                    reject(err);
-                    return;
-                }
-
-                // resolve(body)
-                mkdirp(this.folder, (err) => {
-                    if(err){
-                        reject(err);
-                        return;
-                    }
-
-                    var timestamp = new Date().toISOString().replace(/T/, '_').replace(/\..+/, '').replace(/:/g, '_')
-                    var local_file_path = this.folder + timestamp
-                    fs.writeFileSync(local_file_path, body, 'utf8')
-                    resolve({local_file_path: local_file_path, url: this.url})
-                });
-            });
+            progress(request.get(this.url), {})
+            .on('progress', (state) => {
+                this.stats = state
+            })
+            .on('error', (err) => {
+                reject(err)
+            })
+            .on('end', () => {
+                resolve({local_file_path: this.local_file_path, url: this.url, stats: this.stats})
+            })
+            .pipe(fs.createWriteStream(local_file_path))
         });
     }
 }
