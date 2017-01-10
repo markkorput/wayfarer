@@ -3,6 +3,9 @@ const Promise = require('promise')
 const request = require('request')
 const progress = require('request-progress')
 
+const DEFAULT_GEO_DATA_SERVICE_URL = 'http://freegeoip.net/json/'
+const DEFAULT_GEO_DATA_SERVICE_TIMEOUT = 2000 // ms; 2 seconds
+
 class Downloader {
     constructor(url, options){
         this.url = url
@@ -11,6 +14,7 @@ class Downloader {
         if(!this.folder.endsWith('/')){
             this.folder = this.folder + '/'
         }
+        this.geoDataServiceUrl = this.options.geoDataServiceUrl || DEFAULT_GEO_DATA_SERVICE_URL
     }
 
     download(){
@@ -28,6 +32,7 @@ class Downloader {
                     return
                 }
 
+                this._hostname = response.request.uri.hostname
                 fs.writeFileSync(this.local_file_path, body)
 
                 this.stats = this.stats || {}
@@ -41,6 +46,39 @@ class Downloader {
                 reject(err)
             })
         });
+    }
+
+    setGeoDataServiceUrl(url){
+        this.geoDataServiceUrl = url
+    }
+
+    getGeoDataServiceUrl(){
+        return this._hostname ? this.geoDataServiceUrl.replace('{{host}}', this.hostname) : this.getGeoDataServiceUrl
+    }
+
+    getGeoData(){
+        return new Promise((resolve, reject) => {
+            if(!this._hostname){
+                reject(new Error('No hostname available for getGeoData operations'))
+                return
+            }
+
+            request.get({
+                url: this.getGeoDataServiceUrl(),
+                // request takess care of JSON parsing
+                json: true,
+                timeout: DEFAULT_GEO_DATA_SERVICE_TIMEOUT},
+                (err, response, data) => {
+
+                if(err){
+                    reject(err)
+                    return
+                }
+
+                this.geoData = data //JSON.parse(data)
+                resolve(this.geoData)
+            })
+        })
     }
 }
 

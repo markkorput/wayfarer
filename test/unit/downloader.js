@@ -18,7 +18,7 @@ describe('downloader', () => {
         })
     });
 
-    describe('download', () => {
+    describe('download', (done) => {
         it('should download the specified resource to the local filesystem', (done) => {
             var expected = JSON.stringify({some: 'json'});
             var downloader = new Downloader('http://127.0.0.1:8082/some.json');
@@ -67,4 +67,46 @@ describe('downloader', () => {
             })
         })
     });
+
+    describe('setGeoDataServiceUrl/getGeoDataServiceUrl', () => {
+        it('accepts a URL with a host macro, to be replace with the host specified in the url', () => {
+            var downloader = new Downloader();
+            downloader.setGeoDataServiceUrl('http://127.0.0.1:8082/geo/json/{{host}}')
+            expect(downloader.getGeoDataServiceUrl, 'http://127.0.0.1:8082/geo/json/{{host}}')
+            downloader._hostname = 'asofterworld.com'
+            expect(downloader.getGeoDataServiceUrl, 'http://127.0.0.1:8082/geo/json/asofterworld.com')
+        })
+    })
+
+    describe('getGeoData', (done) => {
+        it('retrieves data from an Geoservice API', (done) => {
+            var geodata = fs.readFileSync('./test/fixtures/asofterworld.com.geo.json')
+
+            // run an http server to test against (wayyyy easier than creating stubs)
+            // for every library involded in the request
+            var server = http.createServer(function (req, res) {
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(geodata);
+            });
+
+            // this helps us to (gracefully) shutdown the server at the end of the test
+            server = http_shutdown(server)
+            server.listen(8082)
+
+            var downloader = new Downloader('http://127.0.0.1:8082/geodata.json');
+            // shortcut so we don't have to perform a download first
+            downloader._hostname = 'asofterworld.com'
+            downloader.setGeoDataServiceUrl('http://127.0.0.1:8082/geodata/json/{{host}}')
+            downloader.getGeoData()
+            .then((geoData) => {
+                expect(geoData).to.equal(downloader.geoData)
+                expect(geoData).to.deep.equal(JSON.parse(geodata))
+                done()
+            })
+            .catch(done)
+            .done((param) => {
+                server.shutdown()
+            });
+        })
+    })
 });
