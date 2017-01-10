@@ -17,6 +17,8 @@ class Page {
         return new Promise((resolve, reject) => {
             this.nightmare
                 .goto(this.url)
+                // .html('./public/downloads/_html', 'HTMLOnly')
+                // .pdf('./public/pdf')
                 .end()
                 .evaluate(() => {
                     var count = document.querySelectorAll('a').length - 1
@@ -35,8 +37,6 @@ class Page {
                     // console.log('yes:', result)
                     resolve(result)
                 })
-                // .html('./public/html')
-                // .pdf('./public/pdf')
                 .catch((err) => {
                     // console.error('failed:', err)
                     reject(err)
@@ -44,12 +44,27 @@ class Page {
         })
     }
 
-    getLinks(){
-        // return new Promise((resolve, reject){
-        //     getLinks
-        // })
-    }
+    getLinkUrl(idx){
+        return new Promise((resolve, reject) => {
+            const responder = () => {
+                if(idx){
+                    // they are stored in inverted order
+                    return resolve(this.link_urls[this.link_urls.length-1-idx])
+                }
+                return resolve(this.link_urls[Math.round(Math.random() * this.link_urls.length)])
+            }
 
+            if(this.link_urls){
+                responder()
+            }
+
+            this.getLinkUrls()
+            .then(() => {
+                responder()
+            })
+            .catch(reject)
+        })
+    }
 }
 
 module.exports = Page
