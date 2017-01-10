@@ -16,19 +16,30 @@ class Downloader {
     download(){
         var timestamp = new Date().toISOString().replace(/T/, '_').replace(/\..+/, '').replace(/:/g, '_')
         this.local_file_path = this.folder + timestamp
+        var self = this
 
         return new Promise((resolve, reject) => {
-            progress(request.get(this.url), {})
+            var transferStart = new Date();
+            progress(request.get(this.url, (err, response, body) => {
+                this.transferTime = ((new Date()) - transferStart)/1000.0;
+
+                if(err){
+                    reject(err)
+                    return
+                }
+
+                fs.writeFileSync(this.local_file_path, body)
+
+                this.stats = this.stats || {}
+
+                resolve({local_file_path: this.local_file_path, url: this.url, stats: this.stats, transferTime: this.transferTime})
+            }), {})
             .on('progress', (state) => {
-                this.stats = state
+                self.stats = state
             })
             .on('error', (err) => {
                 reject(err)
             })
-            .on('end', () => {
-                resolve({local_file_path: this.local_file_path, url: this.url, stats: this.stats})
-            })
-            .pipe(fs.createWriteStream(local_file_path))
         });
     }
 }
