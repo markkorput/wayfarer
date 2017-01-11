@@ -1,5 +1,5 @@
 const Promise = require('promise')
-import Page from './page';
+const Page = require('./page')
 
 class Session {
     constructor(url, options){

@@ -1,25 +1,30 @@
 {
   "name": "wayfarer",
   "version": "0.0.1",
-  "description": "Wayfarer project",
-  "main": "dist/wayfarer.js",
+  "description": "Backend API for Wayfarer project",
+  "main": "dist/index.js",
   "scripts": {
     "test": "gulp",
     "lint": "gulp lint",
     "test-browser": "gulp test-browser",
     "watch": "gulp watch",
     "build": "gulp build",
-    "coverage": "gulp coverage"
+    "coverage": "gulp coverage",
+    "dev": "nodemon src/index.js",
+    "start": "node src/index.js"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/markkorput/wayfarer.git"
   },
   "keywords": [],
-  "author": "Mark van de Korput <mark.korput@gmail.com>",
+  "author": "Short Notion <dr.theman@gmail.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/markkorput/wayfarer/issues"
+  },
+  "engines": {
+    "node": ">=6"
   },
   "homepage": "https://github.com/markkorput/wayfarer",
   "devDependencies": {
@@ -49,14 +54,27 @@
     "sinon": "1.17.5",
     "sinon-chai": "2.8.0",
     "webpack": "1.13.2",
-    "webpack-stream": "3.2.0"
+    "webpack-stream": "3.2.0",
+    "eslint": "^3.11.1",
+    "eslint-config-airbnb": "^13.0.0",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-jsx-a11y": "^2.2.3",
+    "eslint-plugin-react": "^6.7.1",
+    "nodemon": "^1.11.0"
   },
   "babelBoilerplateOptions": {
     "entryFileName": "wayfarer.js",
     "mainVarName": "wayfarer"
   },
   "dependencies": {
+    "bluebird": "^3.4.6",
+    "body-parser": "^1.15.2",
+    "config": "^1.24.0",
+    "express": "^4.14.0",
+    "helmet": "^3.1.0",
     "http-server": "^0.9.0",
+    "mongoose": "^4.7.0",
+    "morgan": "^1.7.0",
     "nightmare": "^2.9.1",
     "promise": "^7.1.1",
     "request": "^2.79.0",
