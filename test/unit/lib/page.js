@@ -1,5 +1,5 @@
 const fs = require('fs')
-import Page from '../../src/lib/page';
+import Page from '../../../src/lib/page';
 
 describe('page', () => {
     // function() notation instead of arrow ( => ) ontation required, otherwise 'this'

@@ -1,39 +1,39 @@
 class Facade {
-  constructor(Schema) {
-    this.Schema = Schema;
+  constructor(Model) {
+    this.Model = Model;
   }
 
   create(input) {
-    const schema = new this.Schema(input);
-    return schema.save();
+    const model = new this.Model(input);
+    return model.save();
   }
 
   update(conditions, update) {
-    return this.Schema
+    return this.Model
     .update(conditions, update, { new: true })
     .exec();
   }
 
   find(query) {
-    return this.Schema
+    return this.Model
     .find(query)
     .exec();
   }
 
   findOne(query) {
-    return this.Schema
+    return this.Model
     .findOne(query)
     .exec();
   }
 
   findById(id) {
-    return this.Schema
+    return this.Model
     .findById(id)
     .exec();
   }
 
   remove(id) {
-    return this.Schema
+    return this.Model
     .findByIdAndRemove(id)
     .exec();
   }

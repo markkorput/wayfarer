@@ -1,5 +1,5 @@
-const controller = require('./session-controller');
 const Router = require('express').Router;
+const controller = require('./controller');
 const router = new Router();
 
 router.route('/')
