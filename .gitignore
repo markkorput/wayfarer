@@ -52,3 +52,4 @@ tmp
 .lock-wscript
 
 public/downloads/*
+config/development.json

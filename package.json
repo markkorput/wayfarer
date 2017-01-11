@@ -10,7 +10,6 @@
     "watch": "gulp watch",
     "build": "gulp build",
     "coverage": "gulp coverage",
-
     "dev": "nodemon src/index.js",
     "start": "node src/index.js"
   },
@@ -56,7 +55,6 @@
     "sinon-chai": "2.8.0",
     "webpack": "1.13.2",
     "webpack-stream": "3.2.0",
-
     "eslint": "^3.11.1",
     "eslint-config-airbnb": "^13.0.0",
     "eslint-plugin-import": "^2.2.0",
@@ -69,17 +67,17 @@
     "mainVarName": "wayfarer"
   },
   "dependencies": {
+    "bluebird": "^3.4.6",
+    "body-parser": "^1.15.2",
+    "config": "^1.24.0",
+    "express": "^4.14.0",
+    "helmet": "^3.1.0",
     "http-server": "^0.9.0",
+    "mongoose": "^4.7.0",
+    "morgan": "^1.7.0",
     "nightmare": "^2.9.1",
     "promise": "^7.1.1",
     "request": "^2.79.0",
-    "request-progress": "^3.0.0",
-
-    "bluebird": "^3.4.6",
-    "body-parser": "^1.15.2",
-    "express": "^4.14.0",
-    "helmet": "^3.1.0",
-    "mongoose": "^4.7.0",
-    "morgan": "^1.7.0"
+    "request-progress": "^3.0.0"
   }
 }
