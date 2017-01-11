@@ -56,6 +56,7 @@
     "mainVarName": "wayfarer"
   },
   "dependencies": {
+    "http-server": "^0.9.0",
     "nightmare": "^2.9.1",
     "promise": "^7.1.1",
     "request": "^2.79.0",

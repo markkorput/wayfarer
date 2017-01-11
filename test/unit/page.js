@@ -1,7 +1,6 @@
 const fs = require('fs')
 import Page from '../../src/page';
 
-
 describe('page', () => {
     // function() notation instead of arrow ( => ) ontation required, otherwise 'this'
     // will not be available inside the handler

@@ -1,8 +1,7 @@
-const http = require('http')
-const http_shutdown = require('http-shutdown');
 var fs = require('fs');
 var PassThrough = require('stream').PassThrough;
 
+import HttpServer from '../lib/http_server';
 import Downloader from '../../src/downloader';
 
 
@@ -19,26 +18,15 @@ describe('downloader', () => {
 
     describe('download', (done) => {
         it('should download the specified resource to the local filesystem', (done) => {
-            var expected = JSON.stringify({some: 'json'});
-            var downloader = new Downloader('http://127.0.0.1:8082/some.json');
-
-            // run an http server to test against (wayyyy easier than creating stubs)
-            // for every library involded in the request
-            var server = http.createServer(function (req, res) {
-                res.writeHead(200, { 'Content-Type': 'application/json' });
-                res.end(expected);
-            });
-
-            // this helps us to (gracefully) shutdown the server at the end of the test
-            server = http_shutdown(server)
-            server.listen(8082)
+            var server = HttpServer.create('./test/fixtures/unit-test-downloader/');
+            var downloader = new Downloader('http://127.0.0.1:'+server.port+'/download_func_test.json');
 
             downloader.download()
             .then((data) => {
                 expect(data.url).to.equal(downloader.url);
                 expect(data.local_file_path.startsWith('./public/downloads')).to.equal(true)
                 expect(fs.statSync(data.local_file_path).isFile()).to.equal(true);
-                expect(fs.readFileSync(data.local_file_path, 'utf8')).to.equal(expected);
+                expect(JSON.parse(fs.readFileSync(data.local_file_path, 'utf8'))).to.deep.equal({some: 'json'});
                 expect(data.stats).to.equal(downloader.stats)
                 expect(data.stats).to.deep.equal({})
                 expect(data.transferTime).to.equal(downloader.transferTime)
@@ -49,7 +37,7 @@ describe('downloader', () => {
             })
             .catch(done)
             .done((param) => {
-                server.shutdown()
+                server.destroy()
             });
         });
 
@@ -79,23 +67,13 @@ describe('downloader', () => {
 
     describe('getGeoData', (done) => {
         it('retrieves data from an Geoservice API', (done) => {
-            var geodata = fs.readFileSync('./test/fixtures/asofterworld.com.geo.json')
+            var server = HttpServer.create('./test/fixtures/unit-test-downloader/');
+            var geodata = fs.readFileSync('./test/fixtures/unit-test-downloader/asofterworld.com.geo.json')
+            var downloader = new Downloader('http://127.0.0.1:'+server.port+'/asofterworld.com');
 
-            // run an http server to test against (wayyyy easier than creating stubs)
-            // for every library involded in the request
-            var server = http.createServer(function (req, res) {
-                res.writeHead(200, { 'Content-Type': 'application/json' });
-                res.end(geodata);
-            });
-
-            // this helps us to (gracefully) shutdown the server at the end of the test
-            server = http_shutdown(server)
-            server.listen(8082)
-
-            var downloader = new Downloader('http://127.0.0.1:8082/geodata.json');
             // shortcut so we don't have to perform a download first
             downloader._hostname = 'asofterworld.com'
-            downloader.setGeoDataServiceUrl('http://127.0.0.1:8082/geodata/json/{{host}}')
+            downloader.setGeoDataServiceUrl('http://127.0.0.1:'+server.port+'/asofterworld.com.geo.json')
             downloader.getGeoData()
             .then((geoData) => {
                 expect(geoData).to.equal(downloader.geoData)
@@ -104,7 +82,7 @@ describe('downloader', () => {
             })
             .catch(done)
             .done((param) => {
-                server.shutdown()
+                server.destroy()
             });
         })
     })
