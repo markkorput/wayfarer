@@ -187,7 +187,8 @@ gulp.task('lint', ['lint-src', 'lint-test', 'lint-gulpfile']);
 gulp.task('build', ['lint', 'clean'], build);
 
 // Lint and run our tests
-gulp.task('test', ['lint'], test);
+gulp.task('test', test);
+gulp.task('testlint', ['lint'], test);
 
 // Set up coverage and run tests
 gulp.task('coverage', ['lint'], coverage);

@@ -1,11 +1,46 @@
 const Nightmare = require('nightmare')
-const Promise = require('promise')
-const fs = require('fs')
+const Promise   = require('promise')
+const fs        = require('fs')
+const path      = require('path')
 
 class Page {
     constructor(url, options){
         this.url = url
         this.options = options || {}
+    }
+
+    load(){
+        var nightmare = Nightmare({
+            paths: {
+                userData: fs.realpathSync('./public/tmp')
+            }
+        })
+
+        var load_path = undefined;
+
+        if(this.localCacheFile){
+            if(fs.existsSync(this.localCacheFile)){
+                load_path = 'file://'+fs.realpathSync(this.localCacheFile)
+            } else {
+                console.warn('Page.load - this.localCacheFile doesn\'t exist: ', this.localCacheFile)
+            }
+        }
+
+        const performCache = this.options.cacheFormat != undefined
+
+        if(performCache){
+            const timestamp = new Date().toISOString().replace(/T/, '_').replace(/\..+/, '').replace(/:/g, '_')
+            this.localCacheFile = path.join(this.options.cacheFolder || './public/downloads', timestamp)
+        }
+
+        // console.log('Page.getLinkUrls using nightmare to goto url: ', load_path || this.url)
+        var result = nightmare
+        .goto(load_path || this.url)
+        // .html(this.localCacheFile, 'HTMLOnly')
+        // .pdf('./public/pdf')
+        // .size()
+
+        return performCache ? result.html(this.localCacheFile, this.options.cacheFormat) : result
     }
 
     getLinkUrls(){
@@ -16,40 +51,30 @@ class Page {
                 resolve(this.link_urls)
             }
 
-            var nightmare = Nightmare({
-                paths: {
-                    userData: fs.realpathSync('./public/tmp')
+            this.load()
+            .end()
+            .evaluate(() => {
+                var count = document.querySelectorAll('a').length - 1
+                var hrefs = []
+                var link
+                while(count >= 0){
+                    link = document.querySelectorAll('a')[count]
+                    hrefs.push(link.href)
+                    count = count -1
                 }
+
+                return hrefs
             })
-
-            // console.log('Page.getLinkUrls using nightmare to goto url: ', this.url)
-            nightmare
-                .goto(this.url)
-                // .html('./public/downloads/_html', 'HTMLOnly')
-                // .pdf('./public/pdf')
-                .end()
-                .evaluate(() => {
-                    var count = document.querySelectorAll('a').length - 1
-                    var hrefs = []
-                    var link
-                    while(count >= 0){
-                        link = document.querySelectorAll('a')[count]
-                        hrefs.push(link.href)
-                        count = count -1
-                    }
-
-                    return hrefs
-                })
-                .then((result) => {
-                    // console.log('Page.getLinkUrls.nightmare.then, result: ', result)
-                    this.link_urls = result
-                    // console.log('yes:', result)
-                    resolve(result)
-                })
-                .catch((err) => {
-                    // console.error('failed:', err)
-                    reject(err)
-                })
+            .then((result) => {
+                // console.log('Page.getLinkUrls.nightmare.then, result: ', result)
+                this.link_urls = result
+                // console.log('yes:', result)
+                resolve(result)
+            })
+            .catch((err) => {
+                // console.error('failed:', err)
+                reject(err)
+            })
         })
     }
 
