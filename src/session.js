@@ -7,6 +7,7 @@ class Session {
         this._active = false
         this._maxVisits = 5
         this.pages = []
+        this._complete = false
     }
 
     start(){
@@ -16,19 +17,30 @@ class Session {
 
                 if(this.pages.length >= this._maxVisits){
                     console.info('session done with ' + this._maxVisits + ' sessions')
+                    this._complete = true
                     this._active = false
                     resolve(this)
                     return
                 }
 
                 var page = new Page(next_url)
+                this.pages.push(page)
+
                 page.getLinkUrl() // random link url from page
                 .then((found_url) => {
-                    this.pages.push(page)
                     // recursive call to self
                     iteration(found_url)
                 })
-                .catch(reject)
+                .catch((err) => {
+                    // TODO; try another link on the previous page
+                    if(err.message.startsWith('ENOURL')){
+                        this._active = false;
+                        resolve(this);
+                        return
+                    }
+
+                    reject(err)
+                })
             }
 
             this._active = true
@@ -42,6 +54,10 @@ class Session {
 
     isActive(){
         return this._active
+    }
+
+    isComplete(){
+        return this._complete
     }
 }
 
