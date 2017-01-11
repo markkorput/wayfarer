@@ -1,7 +1,6 @@
 const http = require('http')
 const http_shutdown = require('http-shutdown');
 var fs = require('fs');
-var request = require('request');
 var PassThrough = require('stream').PassThrough;
 
 import Downloader from '../../src/downloader';
