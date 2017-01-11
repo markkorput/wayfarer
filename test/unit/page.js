@@ -1,12 +1,11 @@
 const fs = require('fs')
 import Page from '../../src/page';
 
-
 describe('page', () => {
     // function() notation instead of arrow ( => ) ontation required, otherwise 'this'
     // will not be available inside the handler
     describe('getLinkUrls', function(){
-        this.timeout(3500); // 3.5 seconds; give the nightmare lib some time to fetch the page
+        this.timeout(4000); // 3.5 seconds; give the nightmare lib some time to fetch the page
 
         it('should return the urls of all the links on the page', (done) => {
             // var page = new Page('http://asofterworld.com')
@@ -24,7 +23,7 @@ describe('page', () => {
     })
 
     describe('getLinkUrl', function(){
-        this.timeout(3500); // 3.5 seconds; give the nightmare lib some time to fetch the page
+        this.timeout(4000); // 3.5 seconds; give the nightmare lib some time to fetch the page
 
         it('should return a random url from the page', (done) => {
             // var page = new Page('http://asofterworld.com')

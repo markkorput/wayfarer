@@ -6,16 +6,24 @@ class Page {
     constructor(url, options){
         this.url = url
         this.options = options || {}
-        this.nightmare = Nightmare({
-            paths: {
-                userData: fs.realpathSync('./public/tmp')
-            }
-        })
     }
 
     getLinkUrls(){
+        // console.log('getLinkUrls for this.url: ', this.url)
         return new Promise((resolve, reject) => {
-            this.nightmare
+            // return cache from previous invocation, if present
+            if(this.link_urls){
+                resolve(this.link_urls)
+            }
+
+            var nightmare = Nightmare({
+                paths: {
+                    userData: fs.realpathSync('./public/tmp')
+                }
+            })
+
+            // console.log('Page.getLinkUrls using nightmare to goto url: ', this.url)
+            nightmare
                 .goto(this.url)
                 // .html('./public/downloads/_html', 'HTMLOnly')
                 // .pdf('./public/pdf')
@@ -33,6 +41,7 @@ class Page {
                     return hrefs
                 })
                 .then((result) => {
+                    // console.log('Page.getLinkUrls.nightmare.then, result: ', result)
                     this.link_urls = result
                     // console.log('yes:', result)
                     resolve(result)
@@ -46,21 +55,29 @@ class Page {
 
     getLinkUrl(idx){
         return new Promise((resolve, reject) => {
-            const responder = () => {
+            this.getLinkUrls()
+            .then((all_urls) => {
+                // console.log('getLinkUrl (single) for this.url: ', this.url, ' got urls: ', all_urls, ' and idx: ', idx)
+                var picked_url = undefined;
+
+                // pick by index if index is specified
                 if(idx){
                     // they are stored in inverted order
-                    return resolve(this.link_urls[this.link_urls.length-1-idx])
+                    picked_url = all_urls[all_urls.length-1-idx]
                 }
-                return resolve(this.link_urls[Math.round(Math.random() * this.link_urls.length)])
-            }
 
-            if(this.link_urls){
-                responder()
-            }
+                // pick random
+                if(!picked_url){
+                    picked_url = all_urls[Math.floor(Math.random() * all_urls.length)]
+                }
 
-            this.getLinkUrls()
-            .then(() => {
-                responder()
+                // console.log('getLinkUrl (single) picked url:', picked_url)
+                if(picked_url){
+                    resolve(picked_url)
+                    return
+                }
+
+                reject(new Error('ENOURL: No URL Found on Page'))
             })
             .catch(reject)
         })
