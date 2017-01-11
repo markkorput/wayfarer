@@ -1,5 +1,5 @@
 import HttpServer from '../lib/http_server';
-import Session from '../../src/session';
+import Session from '../../src/lib/session';
 
 describe('Session', () => {
     describe('constructor', () => {

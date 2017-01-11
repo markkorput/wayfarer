@@ -2,7 +2,7 @@ var fs = require('fs');
 var PassThrough = require('stream').PassThrough;
 
 import HttpServer from '../lib/http_server';
-import Downloader from '../../src/downloader';
+import Downloader from '../../src/lib/downloader';
 
 
 describe('downloader', () => {
