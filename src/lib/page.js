@@ -40,6 +40,8 @@ class Page {
         // .pdf('./public/pdf')
         // .size()
 
+        // https://github.com/electron/electron/blob/master/docs/api/web-contents.md#contentssavepagefullpath-savetype-callback
+        // 'HTMLOnly', 'HTMLComplete' or 'MHTML'
         return performCache ? result.html(this.localCacheFile, this.options.cacheFormat) : result
     }
 

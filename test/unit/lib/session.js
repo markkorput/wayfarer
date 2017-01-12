@@ -68,4 +68,8 @@ describe('Session', () => {
             expect(session.isActive()).to.be.true
         })
     })
+
+    describe('pageOptions options', () => {
+        it('should pass it on to all Page instances it creates');
+    })
 })

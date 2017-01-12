@@ -10,7 +10,7 @@
     "watch": "gulp watch",
     "build": "gulp build",
     "coverage": "gulp coverage",
-    "dev": "nodemon src/index.js",
+    "dev": "nodemon --ignore public/ src/index.js",
     "start": "node src/index.js"
   },
   "repository": {

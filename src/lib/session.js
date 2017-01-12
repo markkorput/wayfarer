@@ -6,6 +6,7 @@ class Session extends EventEmitter {
     constructor(url, options){
         super()
         this.url = url
+        this.options = options || {}
         this._active = false
         this._maxVisits = 5
         this.pages = []
@@ -25,7 +26,7 @@ class Session extends EventEmitter {
                     return
                 }
 
-                var page = new Page(next_url)
+                var page = new Page(next_url, this.options.pageOptions || {})
                 this.pages.push(page)
 
                 page.getLinkUrl() // random link url from page
