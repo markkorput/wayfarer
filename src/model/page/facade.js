@@ -1,7 +1,6 @@
 const BaseFacade = require('../../lib/facade');
 const PageModel  = require('./model');
 
-
 class PageFacade extends BaseFacade {
     /**
      * @name createFromPageUtil
@@ -9,11 +8,15 @@ class PageFacade extends BaseFacade {
      * @param {page} a Page object that contains logic to fetch all links
      * on the webpage and fetch geo data about the webhost from a remote API service.
      *
+     * @param {pageCreatedCallback} (optional) a callback that will be called
+     * every time a page record is create. The listener will be called with one argument;
+     * the doc returned by Mongoose.Model.save
+     *
      * @description Create a DB record in the Page collection, then tries to;
      * - get all link urls from the page object and add them to the record,
      * - obtain geo data from a remote service and append it to the record
      */
-    createFromPageUtil(page){
+    createFromPageUtil(page, pageCreatedCallback){
         // first create a record in the database with the url and the
         // local cache file (so in the future the local cache can be used)
         this.create({
@@ -21,6 +24,9 @@ class PageFacade extends BaseFacade {
             cache_file: page.localCacheFile,
         })
         .then(doc => {
+            if(pageCreatedCallback){
+                pageCreatedCallback(doc)
+            }
             this._addLinks(doc._id, page)
             this._addGeoData(doc._id, page)
         })
@@ -72,14 +78,14 @@ class PageFacade extends BaseFacade {
             // save geo data to this page's existing record in the DB
             this.Model.findByIdAndUpdate(_id, {geo_data: geoData})
             .then(doc => {
-                console.log('[PageFacade._addLinks] saved geo-data for: ', page.url)
+                console.log('[PageFacade._addGeoData] saved geo-data for: ', page.url)
             })
             .catch(err => {
-                console.log('[PageFacade._addLinks] failed to save geo data to db: ', err)
+                console.log('[PageFacade._addGeoData] failed to save geo data to db: ', err)
             })
         })
         .catch(err => {
-            console.warn('[PageFacade._addLinks] failed to fetch geo data (for: ', page.url, '), err:\n', err)
+            console.warn('[PageFacade._addGeoData] failed to fetch geo data (for: ', page.url, '), err:\n', err)
         })
     }
 }
