@@ -11,6 +11,7 @@ class HttpServer {
         this.local_path = path.resolve(local_path || './')
         this.options = options || {}
         this.port = this.options.port || 8082
+        this.requestCount = 0
     }
 
     start(){
@@ -28,6 +29,7 @@ class HttpServer {
     }
 
     _onRequest(req, res){
+        this.requestCount += 1
         const relative_path = req.url.startsWith('/') ? req.url.substring(1) : req.url
         const full_path = path.join(this.local_path, relative_path)
 

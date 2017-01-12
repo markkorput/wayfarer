@@ -1,7 +1,39 @@
 const fs = require('fs')
 import Page from '../../../src/lib/page';
+import HttpServer from '../../lib/http_server';
 
 describe('page', () => {
+    describe('load', function(){
+        this.timeout(4000)
+
+        it('downloads an external resource and saves local cache files if the cacheFormat options is specified', (done) => {
+            // start http server that serves example website
+            var server = HttpServer.create('./test/fixtures/unit-test-page/');
+            // create a page instance with an url that points to the website served our http server
+            var page = new Page('http://localhost:'+server.port+'/xkcd.com.html', {cacheFormat: 'HTMLOnly'})
+
+            expect(server.requestCount).to.equal(0)
+            expect(page.localCacheFile).to.equal(undefined)
+
+            page.load(true)
+            .end(() => {
+                server.destroy()
+            })
+            .then(() => {
+                expect(server.requestCount).to.be.above(0)
+                expect(page.localCacheFile).to.not.equal(undefined)
+                expect(fs.existsSync(page.localCacheFile)).to.be.true
+                // cleanup
+                fs.unlinkSync(page.localCacheFile)
+                done()
+            })
+            .catch((err) => {
+                console.log('err: ', err)
+                done()
+            })
+        })
+    })
+
     // function() notation instead of arrow ( => ) ontation required, otherwise 'this'
     // will not be available inside the handler
     describe('getLinkUrls', function(){

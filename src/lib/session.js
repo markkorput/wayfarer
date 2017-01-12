@@ -1,9 +1,12 @@
-const Promise = require('promise')
-const Page = require('./page')
+const Promise       = require('promise')
+const Page          = require('./page')
+const EventEmitter  = require('events')
 
-class Session {
+class Session extends EventEmitter {
     constructor(url, options){
+        super()
         this.url = url
+        this.options = options || {}
         this._active = false
         this._maxVisits = 5
         this.pages = []
@@ -23,11 +26,12 @@ class Session {
                     return
                 }
 
-                var page = new Page(next_url)
+                var page = new Page(next_url, this.options.pageOptions || {})
                 this.pages.push(page)
 
                 page.getLinkUrl() // random link url from page
                 .then((found_url) => {
+                    this.emit('page', this, page)
                     // recursive call to self
                     iteration(found_url)
                 })
