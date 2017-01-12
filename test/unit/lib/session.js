@@ -14,6 +14,10 @@ describe('Session', () => {
         it('triggers the async process of fetching web-pages and following links', (done) => {
             var server = HttpServer.create('./test/fixtures/unit-test-session/');
             var session = new Session('http://127.0.0.1:'+server.port+'/page1.html');
+            var pageCounter = 0
+            session.on('page', (session, page) => {
+                pageCounter += 1
+            })
 
             // BEFORE
             expect(session.isActive()).to.be.false
@@ -25,6 +29,7 @@ describe('Session', () => {
                 expect(session._maxVisits).to.equal(5) // default
                 expect(session.isActive()).to.be.false
                 expect(session.isComplete()).to.be.true
+                expect(pageCounter).to.equal(5)
                 done()
             })
             .catch(done)

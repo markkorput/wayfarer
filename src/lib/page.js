@@ -1,7 +1,7 @@
-const Nightmare = require('nightmare')
-const Promise   = require('promise')
-const fs        = require('fs')
-const path      = require('path')
+const Nightmare     = require('nightmare')
+const Promise       = require('promise')
+const fs            = require('fs')
+const path          = require('path')
 
 class Page {
     constructor(url, options){
