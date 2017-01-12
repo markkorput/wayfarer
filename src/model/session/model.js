@@ -1,14 +1,9 @@
 const mongoose = require('mongoose');
-
-const pageSchema = new mongoose.Schema({
-  url:   { type: String, required: true },
-  cache_file: { type: String },
-  hrefs: [ String ]
-});
+const PageModel = require('../page/model')
 
 const schema = new mongoose.Schema({
   url:   { type: String, required: true },
-  pages: [ pageSchema ]
+  pages: { type: mongoose.Schema.Types.ObjectId, ref: 'Page' }
 });
 
 module.exports = mongoose.model('Session', schema);

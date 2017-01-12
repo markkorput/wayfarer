@@ -2,10 +2,16 @@ const Nightmare     = require('nightmare')
 const Promise       = require('promise')
 const fs            = require('fs')
 const path          = require('path')
+const url           = require('url')
+const request       = require('request')
+
+const DEFAULT_GEO_DATA_SERVICE_URL = 'http://freegeoip.net/json/{{host}}'
+const DEFAULT_GEO_DATA_SERVICE_TIMEOUT = 2000 // ms; 2 seconds
+const DEFAULT_CACHE_FOLDER = './public/pages'
 
 class Page {
     constructor(url, options){
-        this.url = url
+        this.url = url || 'http://'
         this.options = options || {}
     }
 
@@ -30,7 +36,7 @@ class Page {
 
         if(performCache){
             const timestamp = new Date().toISOString().replace(/T/, '_').replace(/\..+/, '').replace(/:/g, '_')
-            this.localCacheFile = path.join(this.options.cacheFolder || './public/downloads', timestamp)
+            this.localCacheFile = path.join(this.options.cacheFolder || DEFAULT_CACHE_FOLDER, timestamp)
         }
 
         // console.log('Page.getLinkUrls using nightmare to goto url: ', load_path || this.url)
@@ -107,6 +113,37 @@ class Page {
                 reject(new Error('ENOURL: No URL Found on Page'))
             })
             .catch(reject)
+        })
+    }
+
+    getGeoDataServiceUrl(){
+        return (this.options.geoDataServiceUrl || DEFAULT_GEO_DATA_SERVICE_URL).replace('{{host}}', url.parse(this.url).hostname || '')
+    }
+
+    getGeoData(){
+        return new Promise((resolve, reject) => {
+            // cached from previous call?
+            if(this.geoData){
+                resolve(this.geoData);
+                return
+            }
+
+            request.get({
+                url: this.getGeoDataServiceUrl(),
+                // request takess care of JSON parsing
+                json: true,
+                timeout: DEFAULT_GEO_DATA_SERVICE_TIMEOUT},
+                (err, response, data) => {
+
+                if(err){
+                    reject(err)
+                    return
+                }
+
+                // request lib already parses content to JSON
+                this.geoData = data
+                resolve(this.geoData)
+            })
         })
     }
 }
