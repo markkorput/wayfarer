@@ -4,9 +4,7 @@
       "port": 8080
     },
     "mongodb": {
-      "url": "__YOUR_DB_URL__",
-      "usr": "__YOUR_DB_USERNAME__",
-      "psw": "__YOUR_DB_PASSWORD__"
+      "url": "mongodb://<username>:<password>@<host>:<port>/<path>"
     }
   }
 }
