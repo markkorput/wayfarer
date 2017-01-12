@@ -84,4 +84,39 @@ describe('page', () => {
             .done(() => {})
         })
     })
+
+    describe('getGeoData', (done) => {
+        describe('getGeoDataServiceUrl', () => {
+            it('returns the service url for the page\'s webhost', () => {
+                // default value without hostname
+                expect((new Page()).getGeoDataServiceUrl()).to.equal('http://freegeoip.net/json/')
+                // default value with hostname
+                expect((new Page('http://host1.com/page1.html')).getGeoDataServiceUrl()).to.equal('http://freegeoip.net/json/host1.com')
+            })
+        })
+
+        it('takes a geoDataServiceUrl option with {{host}} macro', () => {
+            var page = new Page('http://host2.net/data2.json', {geoDataServiceUrl: 'http://geoservice.io/getgeo?host={{host}}'})
+            expect(page.getGeoDataServiceUrl()).to.equal('http://geoservice.io/getgeo?host=host2.net')
+        })
+
+        it('retrieves data from an Geoservice API', (done) => {
+            // spawn a http-server to test against
+            var server = HttpServer.create('./test/fixtures/unit-test-page/');
+            var expected = fs.readFileSync('./test/fixtures/unit-test-page/asofterworld.com.geo.json')
+            var page = new Page('http://asofterworld.com/rss.xml', {geoDataServiceUrl: 'http://127.0.0.1:'+server.port+'/{{host}}.geo.json'})
+
+            // shortcut so we don't have to perform a download first
+            page.getGeoData()
+            .then((geoData) => {
+                expect(geoData).to.equal(page.geoData)
+                expect(geoData).to.deep.equal(JSON.parse(expected))
+                done()
+            })
+            //.catch(done)
+            .done((param) => {
+                server.destroy()
+            });
+        })
+    })
 })
