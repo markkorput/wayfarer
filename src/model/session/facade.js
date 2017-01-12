@@ -18,15 +18,18 @@ class SessionFacade extends BaseFacade {
         // create like our default BaseFacade
         return super.create(data)
         // after successfull create
-        .then((session_doc) => {
+        .then(session_doc => {
             // we're gonna run a browsing session
             var browsing_session = new BrowsingSession(session_doc.url, {pageOptions: {cacheFormat: 'HTMLComplete'}});
+
             // every time a page is loaded during the browsing session
             browsing_session.on('page', (session, page) => {
                 // let the page facade create a document for it in the DB
                 pageFacade.createFromPageUtil(page)
-                .then((page_doc) => {
-                    this._addPageId(session_doc._id, page_doc._id)
+                .then(page_doc => {
+                    this._addPageId(
+                        session_doc._id,
+                        page_doc._id)
                 })
                 .catch(err => {
                     console.log('[SessionFacade.create] failed to create page record (for: ',page.url,'), err: ', err)
@@ -35,11 +38,11 @@ class SessionFacade extends BaseFacade {
 
             // initiate browsing session
             browsing_session.start()
-            .done(() => {
-                console.info('[SessionFacade.create] browsing session ended')
-            })
             .catch(err => {
                 console.warn('[SessionFacade.create] browsing session errored: ', err)
+            })
+            .done(() => {
+                console.info('[SessionFacade.create] browsing session ended')
             })
         })
     }
@@ -56,9 +59,9 @@ class SessionFacade extends BaseFacade {
         return this.Model.findByIdAndUpdate(session_id, {
             $push: {"pages": page_id}
         })
-        .then(session_page_doc => {
-            console.log('[SessionFacade._addPageId] added page-id to session record')
-        })
+        // .then(session_page_doc => {
+        //     console.log('[SessionFacade._addPageId] added page-id to session record')
+        // })
         .catch(err => {
             console.log('[SessionFacade._addPageId] failed to add page-id to session record')
         })
