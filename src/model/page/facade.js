@@ -3,39 +3,34 @@ const PageModel  = require('./model');
 
 class PageFacade extends BaseFacade {
     /**
+     * @public
      * @name createFromPageUtil
      *
      * @param {page} a Page object that contains logic to fetch all links
      * on the webpage and fetch geo data about the webhost from a remote API service.
      *
-     * @param {pageCreatedCallback} (optional) a callback that will be called
-     * every time a page record is create. The listener will be called with one argument;
-     * the doc returned by Mongoose.Model.save
-     *
      * @description Create a DB record in the Page collection, then tries to;
      * - get all link urls from the page object and add them to the record,
      * - obtain geo data from a remote service and append it to the record
      */
-    createFromPageUtil(page, pageCreatedCallback){
+    createFromPageUtil(page){
         // first create a record in the database with the url and the
         // local cache file (so in the future the local cache can be used)
-        this.create({
+        return this.create({
             url: page.url,
             cache_file: page.localCacheFile,
         })
         .then(doc => {
-            if(pageCreatedCallback){
-                pageCreatedCallback(doc)
-            }
             this._addLinks(doc._id, page)
             this._addGeoData(doc._id, page)
         })
-        .catch(err => {
-            console.warn('createFromPageUtil fialed to create page record in the DB:\n', err)
-        })
+        // .catch(err => {
+        //     console.warn('createFromPageUtil fialed to create page record in the DB:\n', err)
+        // })
     }
 
     /**
+     * @private
      * @name _addLinks
      *
      * @param {_id} Page record id
@@ -63,6 +58,7 @@ class PageFacade extends BaseFacade {
     }
 
     /**
+     * @private
      * @name _addGeoData
      *
      * @param {_id} Page record id
