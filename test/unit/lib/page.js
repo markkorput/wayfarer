@@ -85,17 +85,17 @@ describe('page', () => {
         })
     })
 
-    describe('getGeoData', (done) => {
-        describe('getGeoDataServiceUrl', () => {
-            it('returns the service url for the page\'s webhost', () => {
-                // default value without hostname
-                expect((new Page()).getGeoDataServiceUrl()).to.equal('http://freegeoip.net/json/')
-                // default value with hostname
-                expect((new Page('http://host1.com/page1.html')).getGeoDataServiceUrl()).to.equal('http://freegeoip.net/json/host1.com')
-            })
+    describe('getGeoDataServiceUrl', () => {
+        it('returns the service url for the page\'s webhost', () => {
+            // default value without hostname
+            expect((new Page()).getGeoDataServiceUrl()).to.equal('http://freegeoip.net/json/')
+            // default value with hostname
+            expect((new Page('http://host1.com/page1.html')).getGeoDataServiceUrl()).to.equal('http://freegeoip.net/json/host1.com')
         })
+    })
 
-        it('takes a geoDataServiceUrl option with {{host}} macro', () => {
+    describe('getGeoData', (done) => {
+        it('uses the geoDataServiceUrl option with {{host}} macro', () => {
             var page = new Page('http://host2.net/data2.json', {geoDataServiceUrl: 'http://geoservice.io/getgeo?host={{host}}'})
             expect(page.getGeoDataServiceUrl()).to.equal('http://geoservice.io/getgeo?host=host2.net')
         })
