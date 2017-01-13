@@ -20,7 +20,7 @@ class SessionFacade extends BaseFacade {
         // after successfull create
         .then(session_doc => {
             // we're gonna run a browsing session
-            var browsing_session = new BrowsingSession(session_doc.url, {pageOptions: {cacheFormat: 'HTMLComplete'}});
+            var browsing_session = new BrowsingSession(session_doc.url, {maxVisits: session_doc.max_visits, pageOptions: {cacheFormat: 'HTMLComplete'}});
 
             // every time a page is loaded during the browsing session
             browsing_session.on('page', (session, page) => {

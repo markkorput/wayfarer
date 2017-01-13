@@ -8,7 +8,7 @@ class Session extends EventEmitter {
         this.url = url
         this.options = options || {}
         this._active = false
-        this._maxVisits = 5
+        this.maxVisits = this.options.maxVisits || 5
         this.pages = []
         this._complete = false
     }
@@ -18,8 +18,8 @@ class Session extends EventEmitter {
             var iteration = (next_url) => {
                 // console.log('iteration, visits done: '+this.pages.length+', nexturl: '+next_url)
 
-                if(this.pages.length >= this._maxVisits){
-                    console.info('session done with ' + this._maxVisits + ' sessions')
+                if(this.pages.length >= this.maxVisits){
+                    console.info('session done with ' + this.maxVisits + ' sessions')
                     this._complete = true
                     this._active = false
                     resolve(this)

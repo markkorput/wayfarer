@@ -10,7 +10,7 @@ chai.use(chaiHttp);
 // make sure our API service is running before running the test cases
 before((done) => { app.start(done) })
 
-describe.only('API', () => {
+describe('API', () => {
     describe('GET /session', function(){
         this.timeout(6000)
 
@@ -99,22 +99,23 @@ describe.only('API', () => {
         it('should create a session record and start fetching 5 pages', (done) => {
             chai.request(app)
             .post('/session')
-            .send({url: 'http://localhost:'+app.port+'/fixtures/api/session/page1.html'})
+            .send({url: 'http://localhost:'+app.port+'/fixtures/api/session/page1.html', max_visits: 2})
             .end((err, res) => {
                 expect(err).to.be.null
                 expect(res).to.have.status(201);
+                expect(res.body.max_visits).to.eql(2)
                 expect(res.body.url).to.eql('http://localhost:'+app.port+'/fixtures/api/session/page1.html')
                 var checker = () => {
                     PageModel.count({}, (err, count) => {
                         if(err){ done(err); return; }
 
                         // wait till all five are loaded
-                        if(count == 5){
+                        if(count == 2){
                             SessionModel.findOne({}, (err, session) => {
                                 if(err){ done(err); return; }
 
                                 PageModel.find({}, (err, pages) => {
-                                    expect(pages.length).to.equal(5)
+                                    expect(pages.length).to.equal(2)
                                     _.each(pages, (curpage) => {
                                         expect(session.pages).to.include(curpage._id)
                                     })
