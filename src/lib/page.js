@@ -1,5 +1,5 @@
 const Nightmare     = require('nightmare')
-const Promise       = require('promise')
+const Promise       = require('bluebird')
 const fs            = require('fs')
 const path          = require('path')
 const url           = require('url')

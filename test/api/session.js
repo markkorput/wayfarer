@@ -96,7 +96,7 @@ describe('API', () => {
             ]).nodeify(done)
         })
 
-        it('should create a session record and start fetching 5 pages', (done) => {
+        it('should create a session DB record and start fetching pages', (done) => {
             chai.request(app)
             .post('/session')
             .send({url: 'http://localhost:'+app.port+'/fixtures/api/session/page1.html', max_visits: 2})
