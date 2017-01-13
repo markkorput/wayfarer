@@ -1,26 +1,23 @@
-const fs = require('fs')
-import Page from '../../../src/lib/page';
-import HttpServer from '../../lib/http_server';
+const fs    = require('fs')
+const app   = require('../../../src/app')
+const Page  = require('../../../src/lib/page')
+
+// make sure our HTTP service is running before running the test cases
+before((done) => { app.start(done) })
 
 describe('page', () => {
     describe('load', function(){
         this.timeout(4000)
 
         it('downloads an external resource and saves local cache files if the cacheFormat options is specified', (done) => {
-            // start http server that serves example website
-            var server = HttpServer.create('./test/fixtures/unit-test-page/');
-            // create a page instance with an url that points to the website served our http server
-            var page = new Page('http://localhost:'+server.port+'/xkcd.com.html', {cacheFormat: 'HTMLOnly'})
+            // create a page instance with an url that points to the website served by our http server
+            var page = new Page('http://localhost:'+app.port+'/fixtures/unit-page/xkcd.com.html', {cacheFormat: 'HTMLOnly'})
 
-            expect(server.requestCount).to.equal(0)
             expect(page.localCacheFile).to.equal(undefined)
 
             page.load(true)
-            .end(() => {
-                server.destroy()
-            })
+            .end()
             .then(() => {
-                expect(server.requestCount).to.be.above(0)
                 expect(page.localCacheFile).to.not.equal(undefined)
                 expect(fs.existsSync(page.localCacheFile)).to.be.true
                 // cleanup
@@ -101,10 +98,8 @@ describe('page', () => {
         })
 
         it('retrieves data from an Geoservice API', (done) => {
-            // spawn a http-server to test against
-            var server = HttpServer.create('./test/fixtures/unit-test-page/');
-            var expected = fs.readFileSync('./test/fixtures/unit-test-page/asofterworld.com.geo.json')
-            var page = new Page('http://asofterworld.com/rss.xml', {geoDataServiceUrl: 'http://127.0.0.1:'+server.port+'/{{host}}.geo.json'})
+            var expected = fs.readFileSync('./public/fixtures/unit-page/asofterworld.com.geo.json')
+            var page = new Page('http://asofterworld.com/rss.xml', {geoDataServiceUrl: 'http://127.0.0.1:'+app.port+'/fixtures/unit-page/{{host}}.geo.json'})
 
             // shortcut so we don't have to perform a download first
             page.getGeoData()
@@ -113,10 +108,7 @@ describe('page', () => {
                 expect(geoData).to.deep.equal(JSON.parse(expected))
                 done()
             })
-            //.catch(done)
-            .done((param) => {
-                server.destroy()
-            });
+            .catch(done)
         })
     })
 })

@@ -1,5 +1,10 @@
-import HttpServer from '../../lib/http_server';
+const app   = require('../../../src/app')
+const Page  = require('../../../src/lib/page')
+
 import Session from '../../../src/lib/session';
+
+// make sure our HTTP service is running before running the test cases
+before((done) => { app.start(done) })
 
 describe('Session', () => {
     describe('constructor', () => {
@@ -9,11 +14,12 @@ describe('Session', () => {
     })
 
     describe('start', function(){
-        this.timeout(10000)
+        this.timeout(15000)
 
         it('triggers the async process of fetching web-pages and following links', (done) => {
-            var server = HttpServer.create('./test/fixtures/unit-test-session/');
-            var session = new Session('http://127.0.0.1:'+server.port+'/page1.html');
+            var amount = 2
+            var session = new Session('http://127.0.0.1:'+app.port+'/fixtures/unit-session/page1.html', {maxVisits: amount});
+
             var pageCounter = 0
             session.on('page', (session, page) => {
                 pageCounter += 1
@@ -26,25 +32,20 @@ describe('Session', () => {
             session.start()
             .then((session) => {
                 expect(session.pages.length).to.equal(session.maxVisits)
-                expect(session.maxVisits).to.equal(5) // default
+                expect(session.maxVisits).to.equal(amount) // default
                 expect(session.isActive()).to.be.false
                 expect(session.isComplete()).to.be.true
-                expect(pageCounter).to.equal(5)
+                expect(pageCounter).to.equal(amount)
                 done()
             })
             .catch(done)
-            // without the following line, failed expects in the 'then' callback wouldn't fail the test
-            .done(() => {
-                server.destroy()
-            })
 
             // AFTER
             expect(session.isActive()).to.be.true
         })
 
         it('fails to reach maxVisits gracefully', (done) => {
-            var server = HttpServer.create('./test/fixtures/unit-test-session/');
-            var session = new Session('http://127.0.0.1:'+server.port+'/fail1.html');
+            var session = new Session('http://127.0.0.1:'+app.port+'/fixtures/unit-session/fail1.html');
 
             // BEFORE
             expect(session.isActive()).to.be.false
@@ -53,61 +54,29 @@ describe('Session', () => {
             // Call start and hookup promise callbacks
             session.start()
             .then((session) => {
+                // only two; second page didn't have any links
                 expect(session.pages.length).to.equal(2)
                 expect(session.isActive()).to.be.false
                 expect(session.isComplete()).to.be.false
                 done()
             })
             .catch(done)
-            // without the following line, failed expects in the 'then' callback wouldn't fail the test
-            .done(() => {
-                server.destroy()
-            })
 
             // AFTER
             expect(session.isActive()).to.be.true
-        })
-
-        describe('maxVisits option', () => {
-            it('lets the owner specify how many visit to perform during the session', () => {
-                expect(new Session('url', {maxVisits: 123}).maxVisits).to.eql(123);
-            })
-
-            it('should only perform the specified number of visits', (done) => {
-                var server = HttpServer.create('./test/fixtures/unit-test-session/');
-                var session = new Session('http://127.0.0.1:'+server.port+'/page1.html', {maxVisits: 2});
-
-                var pageCounter = 0
-                session.on('page', (session, page) => {
-                    pageCounter += 1
-                })
-
-                // BEFORE
-                expect(session.isActive()).to.be.false
-
-                // Call start and hookup promise callbacks
-                session.start()
-                .then((session) => {
-                    expect(session.pages.length).to.equal(session.maxVisits)
-                    expect(session.maxVisits).to.equal(2)
-                    expect(session.isActive()).to.be.false
-                    expect(session.isComplete()).to.be.true
-                    expect(pageCounter).to.equal(2)
-                    done()
-                })
-                .catch(done)
-                // without the following line, failed expects in the 'then' callback wouldn't fail the test
-                .done(() => {
-                    server.destroy()
-                })
-
-                // AFTER
-                expect(session.isActive()).to.be.true
-            })
         })
     })
 
     describe('pageOptions options', () => {
         it('should pass it on to all Page instances it creates');
+    })
+
+    describe('maxVisits option', () => {
+        it('lets the owner specify how many visit to perform during the session', () => {
+            // default
+            expect(new Session('url').maxVisits).to.eql(5)
+            // overwritten using maxVisits option
+            expect(new Session('url', {maxVisits: 123}).maxVisits).to.eql(123);
+        })
     })
 })
