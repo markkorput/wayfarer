@@ -7,7 +7,7 @@ module.exports = function(root) {
 
   // make sure the app is shutdown. If it was never started by
   // any of the tests, this won't do anything
-  after(app.shutdown)
+  after((done) => { app.shutdown(done) })
 
   beforeEach(() => {
     // Using these globally-available Sinon features is preferrable, as they're

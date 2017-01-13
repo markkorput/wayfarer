@@ -8,7 +8,7 @@ const Promise       = require('bluebird')
 chai.use(chaiHttp);
 
 // make sure our API service is running before running the test cases
-before(app.start)
+before((done) => { app.start(done) })
 
 describe.only('API', () => {
     describe('GET /session', () => {

@@ -4,6 +4,10 @@ node_js:
   - "5"
   - "stable"
 sudo: false
+services:
+  - mongodb
+# before_script:
+#   - sleep 5 # give mongod time to startup
 script: "gulp coverage"
 after_success:
   - npm install -g codeclimate-test-reporter
