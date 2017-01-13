@@ -8,6 +8,7 @@ const request       = require('request')
 const DEFAULT_GEO_DATA_SERVICE_URL = 'http://freegeoip.net/json/{{host}}'
 const DEFAULT_GEO_DATA_SERVICE_TIMEOUT = 2000 // ms; 2 seconds
 const DEFAULT_CACHE_FOLDER = './public/pages'
+const DEFAULT_CACHE_USERDATA_FOLDER = './public/tmp'
 
 class Page {
     constructor(url, options){
@@ -20,7 +21,7 @@ class Page {
 
         var nightmare = Nightmare({
             paths: {
-                userData: fs.realpathSync('./public/tmp')
+                userData: fs.realpathSync(DEFAULT_CACHE_USERDATA_FOLDER)
             }
         })
 

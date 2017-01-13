@@ -6,14 +6,6 @@ node_js:
 sudo: false
 services:
   - mongodb
-before_script:
-  - export NODE_ENV=ci
-  - export TEST_TIMEOUT_MULTIPLY=10.0
-  - sleep 5 # give mongod time to startup
-script: "gulp coverage"
-after_success:
-  - npm install -g codeclimate-test-reporter
-  - codeclimate-test-reporter < coverage/lcov.info
 # following addons and install config taken from
 # https://github.com/juliangruber/electron-stream#travis
 addons:
@@ -24,3 +16,12 @@ install:
   - export DISPLAY=':99.0'
   - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
   - npm install
+before_script:
+  - export NODE_ENV=ci
+  - export TEST_TIMEOUT_MULTIPLY=10.0
+  - sleep 5 # give mongod time to startup
+script: "gulp test"
+#script: "gulp coverage"
+#after_success:
+#  - npm install -g codeclimate-test-reporter
+#  - codeclimate-test-reporter < coverage/lcov.info

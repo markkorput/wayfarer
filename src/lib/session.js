@@ -60,7 +60,7 @@ class Session extends EventEmitter {
                         iteration(link_url)
                     })
                     .catch(err => {
-                        if(err.message.startsWith('ENOURL')){
+                        if(err.message && err.message.startsWith('ENOURL')){
                             // resolve; we couldn't complete,
                             // but we didn't run into 'real' errors
                             this._active = false
