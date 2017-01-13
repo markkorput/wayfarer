@@ -16,6 +16,8 @@ class Page {
     }
 
     load(){
+        if(this._load_cache) return this._load_cache;
+
         var nightmare = Nightmare({
             paths: {
                 userData: fs.realpathSync('./public/tmp')
@@ -48,7 +50,8 @@ class Page {
 
         // https://github.com/electron/electron/blob/master/docs/api/web-contents.md#contentssavepagefullpath-savetype-callback
         // 'HTMLOnly', 'HTMLComplete' or 'MHTML'
-        return performCache ? result.html(this.localCacheFile, this.options.cacheFormat) : result
+        this._load_cache = performCache ? result.html(this.localCacheFile, this.options.cacheFormat) : result
+        return this._load_cache
     }
 
     getLinkUrls(){

@@ -11,37 +11,57 @@ describe('Session', () => {
         it('takes a url', () => {
             expect((new Session('http://www.xkcd.com')).url).to.equal('http://www.xkcd.com')
         })
+
+        describe('maxVisits option', () => {
+            it('lets the owner specify how many visit to perform during the session', () => {
+                // default
+                expect(new Session('url').maxVisits).to.eql(5)
+                // overwritten using maxVisits option
+                expect(new Session('url', {maxVisits: 123}).maxVisits).to.eql(123);
+            })
+        })
+
+        describe('pageOptions options', () => {
+            it('should pass it on to all Page instances it creates');
+        })
     })
 
     describe('start', function(){
         this.timeout(15000)
 
         it('triggers the async process of fetching web-pages and following links', (done) => {
+            // keep the tests short
             var amount = 2
             var session = new Session('http://127.0.0.1:'+app.port+'/fixtures/unit-session/page1.html', {maxVisits: amount});
 
+            // this will test if our session properly emits
+            // a 'page' event for every page it 'visits'
             var pageCounter = 0
             session.on('page', (session, page) => {
                 pageCounter += 1
             })
 
             // BEFORE
+            expect(session.pages.length).to.equal(0)
             expect(session.isActive()).to.be.false
+            expect(session.isComplete()).to.be.false
 
             // Call start and hookup promise callbacks
             session.start()
             .then((session) => {
-                expect(session.pages.length).to.equal(session.maxVisits)
-                expect(session.maxVisits).to.equal(amount) // default
+                // AFTER async
+                expect(session.pages.length).to.equal(amount)
                 expect(session.isActive()).to.be.false
                 expect(session.isComplete()).to.be.true
+                // also verify event emitting
                 expect(pageCounter).to.equal(amount)
-                done()
-            })
-            .catch(done)
+                return session
+            }).nodeify(done)
 
-            // AFTER
+            // AFTER sync
+            expect(session.pages.length).to.equal(0)
             expect(session.isActive()).to.be.true
+            expect(session.isComplete()).to.be.false
         })
 
         it('fails to reach maxVisits gracefully', (done) => {
@@ -64,19 +84,6 @@ describe('Session', () => {
 
             // AFTER
             expect(session.isActive()).to.be.true
-        })
-    })
-
-    describe('pageOptions options', () => {
-        it('should pass it on to all Page instances it creates');
-    })
-
-    describe('maxVisits option', () => {
-        it('lets the owner specify how many visit to perform during the session', () => {
-            // default
-            expect(new Session('url').maxVisits).to.eql(5)
-            // overwritten using maxVisits option
-            expect(new Session('url', {maxVisits: 123}).maxVisits).to.eql(123);
         })
     })
 })
