@@ -1,10 +1,9 @@
+process.env.NODE_ENV = 'test';
 var app = require('../../src/app')
 
 module.exports = function(root) {
   root = root ? root : global;
   root.expect = root.chai.expect;
-  process.env.NODE_ENV = 'test';
-
 
   // make sure the app is shutdown. If it was never started by
   // any of the tests, this won't do anything

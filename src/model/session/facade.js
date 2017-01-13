@@ -44,6 +44,10 @@ class SessionFacade extends BaseFacade {
             .done(() => {
                 console.info('[SessionFacade.create] browsing session ended')
             })
+
+            // make sure to return the doc, so the caller
+            // also gets it in its .then callbacks
+            return session_doc
         })
     }
 

@@ -2,6 +2,7 @@ const chai          = require('chai')
 const chaiHttp      = require('chai-http')
 const app           = require('../../src/app')
 const SessionModel  = require('../../src/model/session/model')
+const PageModel     = require('../../src/model/page/model')
 const _             = require('lodash')
 const Promise       = require('bluebird')
 chai.use(chaiHttp);
@@ -69,7 +70,61 @@ describe.only('API', () => {
         it('should show a session\'s details together with all session\'s pages\' details');
     })
 
-    describe('POST /session', () => {
-        it('should create a session record and start fetching pages');
+    describe('POST /session', function(){
+        this.timeout(10000) // 10 seconds
+
+        beforeEach((done) => {
+            // remove all session and page records
+            Promise.all([
+                SessionModel.remove({}).exec(),
+                PageModel.remove({}).exec()
+            ]).then((results) => { done() })
+        })
+
+        afterEach((done) => {
+            // remove all session and page records
+            Promise.all([
+                SessionModel.remove({}).exec(),
+                PageModel.remove({}).exec()
+            ]).then((results) => { done() })
+        })
+
+        it('should create a session record and start fetching 5 pages', (done) => {
+            chai.request(app)
+            .post('/session')
+            .send({url: 'http://localhost:'+app.port+'/fixtures/api/session/page1.html'})
+            .end((err, res) => {
+                expect(err).to.be.null
+                expect(res).to.have.status(201);
+                expect(res.body.url).to.eql('http://localhost:'+app.port+'/fixtures/api/session/page1.html')
+                var checker = () => {
+                    PageModel.count({}, (err, count) => {
+                        if(err){ done(err); return; }
+
+                        // wait till all five are loaded
+                        if(count == 5){
+                            SessionModel.findOne({}, (err, session) => {
+                                if(err){ done(err); return; }
+
+                                PageModel.find({}, (err, pages) => {
+                                    expect(pages.length).to.equal(5)
+                                    _.each(pages, (curpage) => {
+                                        expect(session.pages).to.include(curpage._id)
+                                    })
+
+                                    done(err)
+                                    return
+                                })
+                            })
+
+                            return;
+                        }
+
+                        setTimeout(checker, 300);
+                    })
+                }
+                setTimeout(checker, 300);
+            })
+        })
     })
 })

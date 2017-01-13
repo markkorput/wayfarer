@@ -15,6 +15,7 @@ mongoose.Promise = bluebird;
 
 // Configure Middleware
 app.use(helmet());
+app.use(express.static('public'))
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(morgan('tiny'));
@@ -26,6 +27,7 @@ app.use('/', routes);
 var server = http_shutdown(http.createServer(app));
 
 var isRunning = false
+app.port = config.get('wayfarer.server.port')
 
 app.start = function(){
     if(isRunning) return;
@@ -33,8 +35,8 @@ app.start = function(){
     // connect to database server
     mongoose.connect(config.get('wayfarer.mongodb.url'));
     // start our HTTP server
-    server.listen(config.get('wayfarer.server.port'));
-    console.log('Wayfarer API available on port ', config.get('wayfarer.server.port'));
+    server.listen(app.port);
+    console.log('Wayfarer API available on port ', app.port);
     isRunning = true
 }
 
