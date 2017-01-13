@@ -1,6 +1,13 @@
+process.env.NODE_ENV = 'test';
+var app = require('../../src/app')
+
 module.exports = function(root) {
   root = root ? root : global;
   root.expect = root.chai.expect;
+
+  // make sure the app is shutdown. If it was never started by
+  // any of the tests, this won't do anything
+  after(app.shutdown)
 
   beforeEach(() => {
     // Using these globally-available Sinon features is preferrable, as they're

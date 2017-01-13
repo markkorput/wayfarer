@@ -16,21 +16,19 @@ class PageFacade extends BaseFacade {
     createFromPageUtil(page){
         // first create a record in the database with the url and the
         // local cache file (so in the future the local cache can be used)
-        var result = this.create({
+        return this.create({
             url: page.url,
             cache_file: page.localCacheFile,
         })
-
-        result.then(doc => {
+        .then(doc => {
             this._addLinks(doc._id, page)
             this._addGeoData(doc._id, page)
+
+            return doc
         })
         // .catch(err => {
         //     console.warn('createFromPageUtil fialed to create page record in the DB:\n', err)
         // })
-
-        // cannot simply return result.then(...) because the caller would get an undefined doc param
-        return result
     }
 
     /**

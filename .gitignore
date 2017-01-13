@@ -51,6 +51,7 @@ tmp
 # Users Environment Variables
 .lock-wscript
 
+db/*
 public/pages/*
 public/tmp/*
-config/development.json
+config/*

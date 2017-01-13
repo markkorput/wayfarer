@@ -2,7 +2,7 @@
   "name": "wayfarer",
   "version": "0.0.1",
   "description": "Backend API for Wayfarer project",
-  "main": "dist/index.js",
+  "main": "dist/app.js",
   "scripts": {
     "test": "gulp",
     "lint": "gulp lint",
@@ -10,8 +10,8 @@
     "watch": "gulp watch",
     "build": "gulp build",
     "coverage": "gulp coverage",
-    "dev": "nodemon --ignore public/ src/index.js",
-    "start": "node src/index.js"
+    "dev": "nodemon --ignore public/ src/app.js",
+    "start": "node src/app.js"
   },
   "repository": {
     "type": "git",
@@ -34,7 +34,13 @@
     "babel-preset-latest": "6.14.0",
     "babel-register": "6.14.0",
     "chai": "3.5.0",
+    "chai-http": "^3.0.0",
     "del": "2.2.2",
+    "eslint": "^3.11.1",
+    "eslint-config-airbnb": "^13.0.0",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-jsx-a11y": "^2.2.3",
+    "eslint-plugin-react": "^6.7.1",
     "glob": "7.0.6",
     "gulp": "3.9.1",
     "gulp-eslint": "3.0.1",
@@ -51,16 +57,11 @@
     "isparta": "4.0.0",
     "json-loader": "0.5.4",
     "mocha": "3.0.2",
+    "nodemon": "^1.11.0",
     "sinon": "1.17.5",
     "sinon-chai": "2.8.0",
     "webpack": "1.13.2",
-    "webpack-stream": "3.2.0",
-    "eslint": "^3.11.1",
-    "eslint-config-airbnb": "^13.0.0",
-    "eslint-plugin-import": "^2.2.0",
-    "eslint-plugin-jsx-a11y": "^2.2.3",
-    "eslint-plugin-react": "^6.7.1",
-    "nodemon": "^1.11.0"
+    "webpack-stream": "3.2.0"
   },
   "babelBoilerplateOptions": {
     "entryFileName": "wayfarer.js",
