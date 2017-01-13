@@ -27,7 +27,7 @@ describe('Session', () => {
     })
 
     describe('start', function(){
-        this.timeout(15000)
+        this.timeout(10000 * timeout_multiply)
 
         it('triggers the async process of fetching web-pages and following links', (done) => {
             // keep the tests short

@@ -4,6 +4,8 @@ var app = require('../../src/app')
 module.exports = function(root) {
   root = root ? root : global;
   root.expect = root.chai.expect;
+  root.timeout_multiply = parseFloat(process.env.TEST_TIMEOUT_MULTIPLY || 1.0)
+  console.log('timeout_multiply: ', root.timeout_multiply)
 
   // make sure the app is shutdown. If it was never started by
   // any of the tests, this won't do anything

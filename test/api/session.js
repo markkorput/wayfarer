@@ -12,7 +12,7 @@ before((done) => { app.start(done) })
 
 describe('API', () => {
     describe('GET /session', function(){
-        this.timeout(6000)
+        this.timeout(5000 * timeout_multiply)
 
         beforeEach((done) => {
             var promises = _.map([0,1,2,3,4,5,6,7,8,9,10,11], (idx) => {
@@ -43,7 +43,7 @@ describe('API', () => {
     })
 
     describe('GET /session/:id', function(){
-        this.timeout(4000)
+        this.timeout(2000 * timeout_multiply)
 
         afterEach((done) => {
             // cleanup our mess
@@ -78,7 +78,7 @@ describe('API', () => {
     })
 
     describe('POST /session', function(){
-        this.timeout(30000) // #0 seconds; running on a free travis CI account can get slow
+        this.timeout(15000 * timeout_multiply)
 
         beforeEach((done) => {
             // remove all session and page records

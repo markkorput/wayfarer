@@ -8,6 +8,7 @@ services:
   - mongodb
 before_script:
   - export NODE_ENV=ci
+  - export TEST_TIMEOUT_MULTIPLY=10.0
   - sleep 5 # give mongod time to startup
 script: "gulp coverage"
 after_success:

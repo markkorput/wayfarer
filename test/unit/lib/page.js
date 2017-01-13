@@ -7,7 +7,7 @@ before((done) => { app.start(done) })
 
 describe('page', () => {
     describe('load', function(){
-        this.timeout(4000)
+        this.timeout(4000 * timeout_multiply)
 
         it('downloads an external resource and saves local cache files if the cacheFormat options is specified', (done) => {
             // create a page instance with an url that points to the website served by our http server
@@ -34,7 +34,7 @@ describe('page', () => {
     // function() notation instead of arrow ( => ) ontation required, otherwise 'this'
     // will not be available inside the handler
     describe('getLinkUrls', function(){
-        this.timeout(4000); // 3.5 seconds; give the nightmare lib some time to fetch the page
+        this.timeout(4000 * timeout_multiply)
 
         it('should return the urls of all the links on the page', (done) => {
             // var page = new Page('http://asofterworld.com')
@@ -52,7 +52,7 @@ describe('page', () => {
     })
 
     describe('getLinkUrl', function(){
-        this.timeout(4000); // 3.5 seconds; give the nightmare lib some time to fetch the page
+        this.timeout(4000 * timeout_multiply)
 
         it('should return a random url from the page', (done) => {
             // var page = new Page('http://asofterworld.com')
