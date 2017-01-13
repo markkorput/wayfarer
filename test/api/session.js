@@ -14,11 +14,13 @@ describe.only('API', () => {
     describe('GET /session', function(){
         this.timeout(6000)
 
-        beforeEach(() => {
-            for(var i=0; i<12; i++){
-                var session = new SessionModel({url: i});
-                session.save()
-            }
+        beforeEach((done) => {
+            var promises = _.map([0,1,2,3,4,5,6,7,8,9,10,11], (idx) => {
+                var session = new SessionModel({url: idx});
+                return session.save()
+            })
+
+            Promise.all(promises).nodeify(done)
         })
 
         afterEach((done) => {
@@ -30,7 +32,7 @@ describe.only('API', () => {
             chai.request(app)
             .get('/session')
             .end((err, res) => {
-                console.log(res.body)
+                // console.log(res.body)
                 expect(err).to.eql(null)
                 expect(res).to.have.status(200);
                 expect(res.body).to.be.a('array');
@@ -76,15 +78,14 @@ describe.only('API', () => {
     })
 
     describe('POST /session', function(){
-        this.timeout(15000) // 10 seconds
+        this.timeout(30000) // #0 seconds; running on a free travis CI account can get slow
 
         beforeEach((done) => {
             // remove all session and page records
             Promise.all([
                 SessionModel.remove({}).exec(),
                 PageModel.remove({}).exec()
-            ]).then((results) => { done() })
-            .catch(done)
+            ]).nodeify(done)
         })
 
         afterEach((done) => {
@@ -92,8 +93,7 @@ describe.only('API', () => {
             Promise.all([
                 SessionModel.remove({}).exec(),
                 PageModel.remove({}).exec()
-            ]).then((results) => { done() })
-            .catch(done)
+            ]).nodeify(done)
         })
 
         it('should create a session record and start fetching 5 pages', (done) => {
