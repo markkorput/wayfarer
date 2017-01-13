@@ -11,7 +11,9 @@ chai.use(chaiHttp);
 before((done) => { app.start(done) })
 
 describe.only('API', () => {
-    describe('GET /session', () => {
+    describe('GET /session', function(){
+        this.timeout(6000)
+
         beforeEach(() => {
             for(var i=0; i<12; i++){
                 var session = new SessionModel({url: i});
@@ -19,15 +21,16 @@ describe.only('API', () => {
             }
         })
 
-        afterEach(() => {
+        afterEach((done) => {
             // cleanup our mess
-            SessionModel.remove({}).exec()
+            SessionModel.remove({}, done)
         })
 
         it('should list the 10 most recent sessions', (done) => {
             chai.request(app)
             .get('/session')
             .end((err, res) => {
+                console.log(res.body)
                 expect(err).to.eql(null)
                 expect(res).to.have.status(200);
                 expect(res.body).to.be.a('array');
@@ -37,7 +40,9 @@ describe.only('API', () => {
         })
     })
 
-    describe('GET /session/:id', () => {
+    describe('GET /session/:id', function(){
+        this.timeout(4000)
+
         afterEach((done) => {
             // cleanup our mess
             SessionModel.remove({}, done)
@@ -71,7 +76,7 @@ describe.only('API', () => {
     })
 
     describe('POST /session', function(){
-        this.timeout(10000) // 10 seconds
+        this.timeout(15000) // 10 seconds
 
         beforeEach((done) => {
             // remove all session and page records
@@ -79,6 +84,7 @@ describe.only('API', () => {
                 SessionModel.remove({}).exec(),
                 PageModel.remove({}).exec()
             ]).then((results) => { done() })
+            .catch(done)
         })
 
         afterEach((done) => {
@@ -87,6 +93,7 @@ describe.only('API', () => {
                 SessionModel.remove({}).exec(),
                 PageModel.remove({}).exec()
             ]).then((results) => { done() })
+            .catch(done)
         })
 
         it('should create a session record and start fetching 5 pages', (done) => {
