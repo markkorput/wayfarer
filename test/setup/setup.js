@@ -1,4 +1,4 @@
-process.env.NODE_ENV = 'test';
+if(process.env.NODE_ENV != 'ci') process.env.NODE_ENV = 'test';
 var app = require('../../src/app')
 
 module.exports = function(root) {
